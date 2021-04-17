@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
+const ObjectID = require('mongodb').ObjectID;
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.7zutu.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
@@ -22,10 +23,62 @@ app.get('/', (req, res) =>{
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const registrationCollection = client.db("computerBangladesh").collection("registration");
+  const addCourseCollection = client.db("computerBangladesh").collection("courseAdd");
+  const reviewCollection = client.db("computerBangladesh").collection("Review");
  
+
+  app.delete('/delete/:id', (req, res) => {
+    const id = req.params.id;
+    addCourseCollection.findOneAndDelete({_id: ObjectID(id)})
+    .then((document) => res.send(document.deleteCount > 0))
+  });
+  app.get('/courses/:id', (req, res) =>{
+    const id = req.params.id;
+    addCourseCollection.find({_id:ObjectID(id)})
+    .toArray((err, documents)=>{
+        res.send(documents[0])
+    })
+})
+
+
+  app.post('/review', (req, res)=>{
+    const newCourse = req.body;
+   reviewCollection.insertOne(newCourse)
+    .then(result => {
+      console.log('insert count', result.insertedCount);
+      res.send(result.insertedCount > 0)
+    })
+})
+
+app.get('/reviews', (req, res) => {
+  reviewCollection.find()
+  .toArray((err, documents) => {
+    res.send(documents);
+  })
+})
+
+
+  app.post('/course', (req, res)=>{
+    const newCourse = req.body;
+    addCourseCollection.insertOne(newCourse)
+    .then(result => {
+      res.send(result.insertedCount > 0)
+    })
+})
+
+
+app.get('/courses', (req, res) => {
+  addCourseCollection.find()
+  .toArray((err, documents) => {
+    res.send(documents);
+  })
+})
+
+
+
+
 app.post('/AddRegistration', (req, res) => {
      const registration = req.body;
-     console.log(registration);
       registrationCollection.insertOne(registration)
        .then(result =>{
           res.send(result.insertedCount > 0)
@@ -33,7 +86,6 @@ app.post('/AddRegistration', (req, res) => {
 })
 
 app.get('/Registration', (req, res) => {
-    // console.log(req.query.email);
     registrationCollection.find({email: req.query.email})
     .toArray((err, documents) => {
       res.send(documents);
@@ -41,13 +93,13 @@ app.get('/Registration', (req, res) => {
   })
 
   app.get('/Registrations', (req, res) => {
-    // console.log(req.query.email);
     registrationCollection.find()
-    // {email: req.query.email}
     .toArray((err, documents) => {
       res.send(documents);
     })
   })
+
+
 
 
 
