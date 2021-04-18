@@ -25,7 +25,33 @@ client.connect(err => {
   const registrationCollection = client.db("computerBangladesh").collection("registration");
   const addCourseCollection = client.db("computerBangladesh").collection("courseAdd");
   const reviewCollection = client.db("computerBangladesh").collection("Review");
+  const adminCollection = client.db("computerBangladesh").collection("admin");
  
+
+
+  app.post('/isAdmin', (req, res)=>{
+    const newCourse = req.body;
+    console.log(newCourse);
+    adminCollection.insertOne(newCourse)
+    .then(result => {
+      res.send(result.insertedCount > 0)
+    })
+})
+
+app.post('/admin', (req, res) => {
+  const email = req.body.email;
+  adminCollection.find({email: email})
+  .toArray((err, documents)=> {
+    res.send(documents.length > 0)
+  })
+})
+
+
+
+
+
+
+
 
   app.delete('/delete/:id', (req, res) => {
     const id = req.params.id;
