@@ -7,6 +7,11 @@ admin user option 1/add course 2/Registert suudent list all 3/make admin 4/manag
 
 User option 1/Registration create 2/ Only login email registration list 3/Review
 
+This Educational Demo-website.
+• User Dashboard ( Booking, Payment Confirm, Review)
+• Admin Panel (Add Service, Make New Admin, Delete Service)
+
+
 
 
 Live site: https://computer-bangladesh.web.app/
